@@ -1,8 +1,13 @@
-using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using bibliotecaWeb.Models;
+using System.Diagnostics;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
+using System.Linq;
+using BibliotecaMVC.Models;
+using BibliotecaMVC.Data;
 
-namespace bibliotecaWeb.Controllers;
+namespace BibliotecaWeb.Controllers;
 
 public class HomeController : Controller
 {

@@ -1,0 +1,29 @@
+@{
+    ViewData["Title"] = "Dashboard do Usuário";
+    var nome = Context.Session.GetString("UsuarioNome");
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Biblioteca Online</title>
+    <link rel="stylesheet" href="~/css/dashboard.css" />
+</head>
+
+<body>
+    <a href="/Login/Logoff" class="logout-btn">Sair</a>
+
+    <div class="dashboard">
+        <h1>Bem-vindo, @nome!</h1>
+        <div class="options">
+            <a href="/Reserva/Index" class="card">
+                <i class="fas fa-book-reader"></i> Reservar Livros
+            </a>
+        </div>
+    </div>
+</body>
+
+</html>
