@@ -1,0 +1,58 @@
+## Build results
+bin/
+obj/
+out/
+[Ll]og/
+*.log
+
+## ASP.NET Core static web assets
+*.staticwebassets.runtime.json
+*.staticwebassets.build.json
+*.staticwebassets.development.json
+
+## Rider
+.idea/
+
+## VS Code
+.vscode/
+.history/
+
+## User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## NuGet
+*.nupkg
+*.snupkg
+.nuget/
+packages/
+*.nuspec
+project.assets.json
+project.nuget.cache
+
+## dotCover
+*.dotCover
+
+## Other files
+project.lock.json
+project.fragment.lock.json
+artifacts/
+*.gpState
+*.cache
+
+## OS generated files
+.DS_Store
+*.swp
+*.swn
+*.swo
+ehthumbs.db
+Thumbs.db
+
+## ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+## Linux / Mac specific
+*.pid
+*.pid.lock
