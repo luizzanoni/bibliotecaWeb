@@ -1,0 +1,79 @@
+@model List<BibliotecaMVC.Models.Usuario>
+
+@{
+    ViewData["Title"] = "Gerenciar Usuários";
+    var nome = Context.Session.GetString("UsuarioNome");
+    var tipoUsuario = Context.Session.GetString("TipoUsuario");
+    var isAdmin = tipoUsuario == "Admin";
+}
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Gerenciar Usuários</title>
+    <link rel="stylesheet" href="~/css/dashboard.css" />
+</head>
+
+<body>
+    <div class="dashboard">
+        <h2>Gerenciar Usuários</h2>
+        <p>Olá, @nome! Aqui você pode cadastrar e visualizar os usuários do sistema:</p>
+
+        <table class="livros-table">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Tipo</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var usuario in Model)
+                {
+                    <tr>
+                        <td>@usuario.Nome</td>
+                        <td>@(usuario.Admin ? "Admin" : "Comum")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <div style="margin-top: 30px;">
+            @if (isAdmin)
+            {
+                <button class="btn-adicionar"
+                    onclick="document.getElementById('formAdicionar').style.display = 'block'; this.style.display = 'none'; return false;">
+                    ➕ Adicionar Usuário
+                </button>
+            }
+
+            <a href="/Login/Dashboard" class="logout-btn">Voltar</a>
+        </div>
+
+        @if (isAdmin)
+        {
+            <div id="formAdicionar" style="display:none; margin-top: 30px;" class="form-adicionar-livro">
+                <form asp-controller="Usuario" asp-action="Create" method="post" class="form-grid">
+                    <div>
+                        <label for="Nome">Nome</label>
+                        <input type="text" name="Nome" required />
+                    </div>
+                    <div>
+                        <label for="Senha">Senha</label>
+                        <input type="password" name="Senha" required />
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 5px;">
+                        <label for="Admin">Admin?</label>
+                        <input type="checkbox" name="Admin" value="true" />
+                        <input type="hidden" name="Admin" value="false" />
+                    </div>
+
+                    <button type="submit" class="btn-reservar">Cadastrar Usuário</button>
+                </form>
+            </div>
+        }
+    </div>
+</body>
+
+</html>
