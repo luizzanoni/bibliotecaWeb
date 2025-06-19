@@ -5,6 +5,7 @@
     var nome = Context.Session.GetString("UsuarioNome");
     var tipoUsuario = Context.Session.GetString("TipoUsuario");
     var isAdmin = tipoUsuario == "Admin";
+    var usuarioId = Context.Session.GetInt32("UsuarioId") ?? 0;
     Layout = null;
 }
 
@@ -34,25 +35,38 @@
             <tbody>
                 @foreach (var livro in Model)
                 {
-                    <tr>
-                        <td>@livro.Titulo</td>
-                        <td>@livro.Autor</td>
-                        <td>@livro.Ano</td>
-                        <td>
-                            <form asp-controller="Reserva" asp-action="Reservar" method="post" style="display:inline;">
-                                <input type="hidden" name="livroId" value="@livro.Id" />
-                                <button type="submit" class="btn-reservar">Reservar</button>
-                            </form>
-
-                            @if (isAdmin)
-                            {
-                                <form asp-controller="Livro" asp-action="Delete" method="post" style="display:inline;">
-                                    <input type="hidden" name="id" value="@livro.Id" />
-                                    <button type="submit" class="btn-remover">Remover</button>
-                                </form>
-                            }
-                        </td>
-                    </tr>
+                    // Mostrar apenas livros não reservados ou reservados por este usuário
+                    if (!livro.Reservado || livro.IdUsuarioReserva == usuarioId)
+                    {
+                        <tr>
+                            <td>@livro.Titulo</td>
+                            <td>@livro.Autor</td>
+                            <td>@livro.Ano</td>
+                            <td>
+                                @if (!livro.Reservado)
+                                {
+                                    <form asp-controller="Reserva" asp-action="Reservar" method="post" style="display:inline;">
+                                        <input type="hidden" name="livroId" value="@livro.Id" />
+                                        <button type="submit" class="btn-reservar">Reservar</button>
+                                    </form>
+                                }
+                                else if (livro.IdUsuarioReserva == usuarioId)
+                                {
+                                    <form asp-controller="Reserva" asp-action="CancelarReserva" method="post" style="display:inline;">
+                                        <input type="hidden" name="livroId" value="@livro.Id" />
+                                        <button type="submit" class="btn-remover">Cancelar</button>
+                                    </form>
+                                }
+                                @if (isAdmin)
+                                {
+                                    <form asp-controller="Livro" asp-action="Delete" method="post" style="display:inline;">
+                                        <input type="hidden" name="id" value="@livro.Id" />
+                                        <button type="submit" class="btn-remover">Remover</button>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
                 }
             </tbody>
         </table>
@@ -61,7 +75,7 @@
             @if (isAdmin)
             {
                 <button class="btn-adicionar"
-                    onclick="document.getElementById('formAdicionar').style.display = 'block'; this.style.display = 'none'; return false;">
+                        onclick="document.getElementById('formAdicionar').style.display = 'block'; this.style.display = 'none'; return false;">
                     ➕ Adicionar Livro
                 </button>
             }
@@ -89,7 +103,6 @@
                 </form>
             </div>
         }
-        
     </div>
 </body>
 
