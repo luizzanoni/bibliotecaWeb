@@ -23,6 +23,11 @@
         <h2>Reservar Livros</h2>
         <p>Olá, @nome! Selecione um livro para reservar:</p>
 
+        <form method="get" style="margin-bottom: 24px;">
+            <input type="text" name="filtro" placeholder="Buscar por título..." value="@Context.Request.Query["filtro"]" style="padding:8px; border-radius:6px; border:1px solid #ccc; width:220px;" />
+            <button type="submit" class="btn-reservar" style="width:auto; margin-left:8px;">Buscar</button>
+        </form>
+
         <table class="livros-table">
             <thead>
                 <tr>
@@ -54,7 +59,7 @@
                                 {
                                     <form asp-controller="Reserva" asp-action="CancelarReserva" method="post" style="display:inline;">
                                         <input type="hidden" name="livroId" value="@livro.Id" />
-                                        <button type="submit" class="btn-remover">Cancelar</button>
+                                        <button type="submit" class="btn-cancelar">Cancelar</button>
                                     </form>
                                 }
                                 @if (isAdmin)
@@ -70,6 +75,23 @@
                 }
             </tbody>
         </table>
+
+        @if (ViewBag.TotalPaginas > 1)
+        {
+            <nav style="margin-top: 20px; text-align:center;">
+                @for (int i = 1; i <= (int)ViewBag.TotalPaginas; i++)
+                {
+                    if (i == (int)ViewBag.PaginaAtual)
+                    {
+                        <span style="margin:0 6px; font-weight:bold; color:#2575fc;">@i</span>
+                    }
+                    else
+                    {
+                        <a href="?pagina=@i@(ViewBag.Filtro != null ? $"&filtro={ViewBag.Filtro}" : "")" style="margin:0 6px; color:#2575fc; text-decoration:none;">@i</a>
+                    }
+                }
+            </nav>
+        }
 
         <div style="margin-top: 30px;">
             @if (isAdmin)

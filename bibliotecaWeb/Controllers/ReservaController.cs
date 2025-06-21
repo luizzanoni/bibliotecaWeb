@@ -1,23 +1,39 @@
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
-using System.Linq;
-using BibliotecaMVC.Models;
 using BibliotecaMVC.Data;
+using BibliotecaMVC.Models;
+using BibliotecaMVC.Repositories.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BibliotecaMVC.Controllers
 {
     public class ReservaController : Controller
     {
-        public IActionResult Index()
+        private const int TamanhoPagina = 5;
+        private readonly ILivroRepository _livroRepository;
+        private readonly IReservaRepository _reservaRepository;
+
+        public ReservaController(ILivroRepository livroRepository, IReservaRepository reservaRepository)
+        {
+            _livroRepository = livroRepository;
+            _reservaRepository = reservaRepository;
+        }
+
+        public IActionResult Index(string filtro, int pagina = 1)
         {
             int usuarioId = HttpContext.Session.GetInt32("UsuarioId") ?? 0;
 
-            // Mostra livros disponíveis ou que o próprio usuário reservou
-            var livrosDisponiveis = FakeDatabase.Livros
-                .Where(l => !l.Reservado || l.IdUsuarioReserva == usuarioId)
+            var livrosDisponiveis = FiltrarLivrosDisponiveis(usuarioId, filtro);
+
+            var totalLivros = livrosDisponiveis.Count();
+            var livrosPaginados = livrosDisponiveis
+                .Skip((pagina - 1) * TamanhoPagina)
+                .Take(TamanhoPagina)
                 .ToList();
 
-            return View(livrosDisponiveis);
+            ViewBag.PaginaAtual = pagina;
+            ViewBag.TotalPaginas = (int)Math.Ceiling(totalLivros / (double)TamanhoPagina);
+            ViewBag.Filtro = filtro;
+
+            return View(livrosPaginados);
         }
 
         [HttpPost]
@@ -25,19 +41,20 @@ namespace BibliotecaMVC.Controllers
         {
             int usuarioId = HttpContext.Session.GetInt32("UsuarioId") ?? 0;
 
-            var livro = FakeDatabase.Livros.FirstOrDefault(l => l.Id == livroId);
+            var livro = _livroRepository.GetById(livroId);
 
             if (livro != null && !livro.Reservado)
             {
                 livro.Reservado = true;
                 livro.IdUsuarioReserva = usuarioId;
 
-                FakeDatabase.Reservas.Add(new Reserva
+                _reservaRepository.Add(new Reserva
                 {
-                    Id = FakeDatabase.Reservas.Count + 1,
                     IdLivro = livroId,
                     IdUsuario = usuarioId
                 });
+
+                _reservaRepository.Save();
             }
 
             return RedirectToAction("Index");
@@ -48,17 +65,31 @@ namespace BibliotecaMVC.Controllers
         {
             int usuarioId = HttpContext.Session.GetInt32("UsuarioId") ?? 0;
 
-            var livro = FakeDatabase.Livros.FirstOrDefault(l => l.Id == livroId);
-            var reserva = FakeDatabase.Reservas.FirstOrDefault(r => r.IdLivro == livroId && r.IdUsuario == usuarioId);
+            var livro = _livroRepository.GetById(livroId);
+            var reserva = _reservaRepository.GetByLivroIdAndUsuarioId(livroId, usuarioId);
 
             if (livro != null && reserva != null)
             {
                 livro.Reservado = false;
                 livro.IdUsuarioReserva = null;
-                FakeDatabase.Reservas.Remove(reserva);
+
+                _reservaRepository.Remove(reserva);
+                _reservaRepository.Save();
             }
 
             return RedirectToAction("Index");
+        }
+
+        private IEnumerable<Livro> FiltrarLivrosDisponiveis(int usuarioId, string filtro)
+        {
+            var livros = _livroRepository
+                .GetAll()
+                .Where(l => !l.Reservado || l.IdUsuarioReserva == usuarioId);
+
+            if (!string.IsNullOrWhiteSpace(filtro))
+                livros = livros.Where(l => l.Titulo.Contains(filtro, StringComparison.OrdinalIgnoreCase));
+
+            return livros;
         }
     }
 }
