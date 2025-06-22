@@ -1,11 +1,17 @@
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
-using System.Linq;
-using BibliotecaMVC.Models;
 using BibliotecaMVC.Data;
+using BibliotecaMVC.Repositories.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 
 public class LoginController : Controller
 {
+    private readonly IUsuarioRepository _usuarioRepository;
+    private readonly ILivroRepository _livroRepository;
+    public LoginController(IUsuarioRepository usuarioRepository, ILivroRepository livroRepository)
+    {
+        _usuarioRepository = usuarioRepository;
+        _livroRepository = livroRepository;
+    }
+
     [HttpGet]
     public IActionResult Index()
     {
@@ -16,7 +22,9 @@ public class LoginController : Controller
     [HttpPost]
     public IActionResult Index(string nome, string senha)
     {
-        var usuario = FakeDatabase.Usuarios.FirstOrDefault(u => u.Nome == nome && u.Senha == senha);
+        var usuario = _usuarioRepository.GetByCredentials(nome, senha);
+
+
         if (usuario != null)
         {
             HttpContext.Session.SetString("NomeUsuario", usuario.Nome);
@@ -40,7 +48,7 @@ public class LoginController : Controller
         if (tipo == "Admin")
             return View("DashboardAdmin");
 
-        var livros = FakeDatabase.Livros;
+        var livros = _livroRepository.GetAll();
         return View("DashboardUsuario", livros);
     }
 

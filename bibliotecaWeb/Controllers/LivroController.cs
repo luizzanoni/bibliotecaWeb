@@ -1,17 +1,25 @@
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
-using System.Linq;
-using BibliotecaMVC.Models;
 using BibliotecaMVC.Data;
+using BibliotecaMVC.Models;
+using BibliotecaMVC.Repositories.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BibliotecaMVC.Controllers
 {
     public class LivroController : Controller
     {
-        private static List<Livro> livros = new List<Livro>();
+        private readonly ILivroRepository _livroRepository;
+
+        public LivroController(ILivroRepository livroRepository)
+        {
+            _livroRepository = livroRepository;
+        }
 
         [HttpGet]
-        public IActionResult Index() => View(livros);
+        public IActionResult Index()
+        {
+            var livros = _livroRepository.GetAll();
+            return View(livros);
+        }
 
         [HttpGet]
         public IActionResult Create() => View();
@@ -19,10 +27,11 @@ namespace BibliotecaMVC.Controllers
         [HttpPost]
         public IActionResult Delete(int id)
         {
-            var livro = FakeDatabase.Livros.FirstOrDefault(l => l.Id == id);
+            var livro = _livroRepository.GetById(id);
             if (livro != null)
             {
-                FakeDatabase.Livros.Remove(livro);
+                _livroRepository.Remove(livro);
+                _livroRepository.Save();
             }
             return RedirectToAction("Index", "Reserva");
         }
@@ -30,8 +39,9 @@ namespace BibliotecaMVC.Controllers
         [HttpPost]
         public IActionResult Create(Livro livro)
         {
-            livro.Id = FakeDatabase.Livros.Max(l => l.Id) + 1;
-            FakeDatabase.Livros.Add(livro);
+            _livroRepository.Add(livro);
+            _livroRepository.Save();
+
             return RedirectToAction("Index", "Reserva");
         }
     }
