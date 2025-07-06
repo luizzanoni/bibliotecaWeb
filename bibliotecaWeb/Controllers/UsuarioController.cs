@@ -12,9 +12,22 @@ public class UsuarioController : Controller
         _usuarioRepository = usuarioRepository;
     }
 
-    public IActionResult Index()
+    public IActionResult Index(string sortOrder)
     {
         var usuarios = _usuarioRepository.GetAll();
+
+        usuarios = sortOrder switch
+        {
+            "nome_desc" => usuarios.OrderByDescending(u => u.Nome).ToList(),
+            "tipo" => usuarios.OrderBy(u => u.Admin).ToList(),
+            "tipo_desc" => usuarios.OrderByDescending(u => u.Admin).ToList(),
+            _ => usuarios.OrderBy(u => u.Nome).ToList(), // Nome crescente
+        };
+
+        ViewBag.NomeSortParam = sortOrder == "nome" ? "nome_desc" : "nome";
+        ViewBag.TipoSortParam = sortOrder == "tipo" ? "tipo_desc" : "tipo";
+        ViewBag.CurrentSort = sortOrder;
+
         return View(usuarios);
     }
 

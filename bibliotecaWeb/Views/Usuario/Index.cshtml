@@ -24,8 +24,16 @@
         <table class="livros-table">
             <thead>
                 <tr>
-                    <th>Nome</th>
-                    <th>Tipo</th>
+                    <th>
+                        <a asp-action="Index" asp-route-sortOrder="@ViewBag.NomeSortParam">
+                            Nome @(ViewBag.CurrentSort == "nome" ? "↑" : ViewBag.CurrentSort == "nome_desc" ? "↓" : "")
+                        </a>
+                    </th>
+                    <th>
+                        <a asp-action="Index" asp-route-sortOrder="@ViewBag.TipoSortParam">
+                            Tipo @(ViewBag.CurrentSort == "tipo" ? "↑" : ViewBag.CurrentSort == "tipo_desc" ? "↓" : "")
+                        </a>
+                    </th>
                 </tr>
             </thead>
             <tbody>
