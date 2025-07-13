@@ -14,6 +14,10 @@ public class UsuarioController : Controller
 
     public IActionResult Index(string sortOrder)
     {
+        int? usuarioId = HttpContext.Session.GetInt32("UsuarioId");
+        if (usuarioId == null)
+            return RedirectToAction("Index", "Login");
+
         var usuarios = _usuarioRepository.GetAll();
 
         usuarios = sortOrder switch
