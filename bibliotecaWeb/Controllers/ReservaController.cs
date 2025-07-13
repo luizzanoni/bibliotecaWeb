@@ -19,9 +19,11 @@ namespace BibliotecaMVC.Controllers
 
         public IActionResult Index(string filtro, int pagina = 1)
         {
-            int usuarioId = HttpContext.Session.GetInt32("UsuarioId") ?? 0;
+            int? usuarioId = HttpContext.Session.GetInt32("UsuarioId");
+            if (usuarioId == null)
+                return RedirectToAction("Index", "Login");
 
-            var livrosDisponiveis = FiltrarLivrosDisponiveis(usuarioId, filtro);
+            var livrosDisponiveis = FiltrarLivrosDisponiveis(usuarioId.Value, filtro);
 
             var totalLivros = livrosDisponiveis.Count();
             var livrosPaginados = livrosDisponiveis
@@ -39,7 +41,9 @@ namespace BibliotecaMVC.Controllers
         [HttpPost]
         public IActionResult Reservar(int livroId)
         {
-            int usuarioId = HttpContext.Session.GetInt32("UsuarioId") ?? 0;
+            int? usuarioId = HttpContext.Session.GetInt32("UsuarioId");
+            if (usuarioId == null)
+                return RedirectToAction("Index", "Login");
 
             var livro = _livroRepository.GetById(livroId);
 
@@ -51,7 +55,7 @@ namespace BibliotecaMVC.Controllers
                 _reservaRepository.Add(new Reserva
                 {
                     IdLivro = livroId,
-                    IdUsuario = usuarioId
+                    IdUsuario = usuarioId.Value
                 });
 
                 _reservaRepository.Save();
@@ -63,10 +67,12 @@ namespace BibliotecaMVC.Controllers
         [HttpPost]
         public IActionResult CancelarReserva(int livroId)
         {
-            int usuarioId = HttpContext.Session.GetInt32("UsuarioId") ?? 0;
+            int? usuarioId = HttpContext.Session.GetInt32("UsuarioId");
+            if (usuarioId == null)
+                return RedirectToAction("Index", "Login");
 
             var livro = _livroRepository.GetById(livroId);
-            var reserva = _reservaRepository.GetByLivroIdAndUsuarioId(livroId, usuarioId);
+            var reserva = _reservaRepository.GetByLivroIdAndUsuarioId(livroId, usuarioId.Value);
 
             if (livro != null && reserva != null)
             {
