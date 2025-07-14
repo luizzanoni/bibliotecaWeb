@@ -54,8 +54,9 @@ dotnet restore
 dotnet run
 
 # 4. Acesse no navegador
-http://localhost:5xxx
+http://localhost:xxxx
 ```
+> ⚠️ **Importante:** A porta que ele fará o build, dependerá de cada computador... verifique o terminal ou console para abrir no local correto.
 
 ---
 
@@ -72,9 +73,9 @@ dotnet restore
 dotnet run
 
 # 4. Acesse via navegador
-http://localhost:5xxx
+http://localhost:xxxx
 ```
-A porta que ele fará o build, dependerá de cada computador... verifique o terminal ou console para abrir no local correto.
+> ⚠️ **Importante:** A porta que ele fará o build, dependerá de cada computador... verifique o terminal ou console para abrir no local correto.
 
 > ⚠️ No Linux, verifique se você tem permissões de execução e se o SDK .NET está corretamente instalado via Snap, APT ou script oficial.
 
